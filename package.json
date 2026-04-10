@@ -1,0 +1,17 @@
+{
+  "name": "slack-notifier-agent",
+  "version": "1.0.0",
+  "description": "A2A-compliant Slack notification agent powered by Claude",
+  "main": "src/agent.js",
+  "scripts": {
+    "start": "node src/agent.js",
+    "dev": "node --watch src/agent.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "slack-notifier-agent",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "forwardPorts": [3100],
+  "portsAttributes": {
+    "3100": {
+      "label": "A2A Server",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    }
+  },
+  "postCreateCommand": "npm install && cp -n .env.example .env || true",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  }
+}
