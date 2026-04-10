@@ -2,7 +2,7 @@
 
 > A2A-compliant Slack notification agent powered by Claude. Receives task requests from other agents, uses Claude to craft a friendly message, and posts it to Slack.
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/lbrenman/slack-notifier-agent)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/lbrenman/slack-notifier-agent-ai-agent-a2a-helloworld)
 
 ## How It Works
 
