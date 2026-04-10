@@ -15,7 +15,7 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/lbrenman/slack-notifier-agent
+git clone https://github.com/lbrenman/slack-notifier-agent-ai-agent-a2a-helloworld
 cd slack-notifier-agent
 npm install
 cp .env.example .env    # fill in ANTHROPIC_API_KEY and SLACK_WEBHOOK
@@ -29,7 +29,7 @@ After the Codespace starts:
 2. Run `npm start`
 3. Go to the **Ports** tab in VS Code
 4. Find port `3100` — make sure visibility is set to **Public**
-5. Copy the public forwarded URL — you'll paste it into `github-monitor`'s `.env` as `NOTIFIER_URL`
+5. Copy the public forwarded URL — you'll paste it into `github-monitor-ai-agent-a2a-helloworld`'s `.env` as `NOTIFIER_URL`
 
 ## Environment Variables
 
