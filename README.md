@@ -27,9 +27,10 @@ npm start
 After the Codespace starts:
 1. Fill in `.env` with your keys
 2. Go to the **Ports** tab in VS Code, find port `3100`, set visibility to **Public**
-3. Copy the public forwarded URL and set it as `PUBLIC_URL` in `.env` (this is what the Agent Card advertises as its `url`)
+3. Copy the public forwarded URL and paste it into **this repo's own `.env`** as `PUBLIC_URL` (this is what the Agent Card advertises as its `url` — without it, remote clients like A2A Inspector try to reach `localhost` and fail)
 4. Run `npm start`
 5. Paste the forwarded URL + `/.well-known/agent-card.json` into A2A Inspector to validate
+6. If you're also running `github-monitor-ai-agent-a2a-helloworld`, paste the same forwarded URL into *that* repo's `.env` as `NOTIFIER_URL` so it can find this agent
 
 ## Environment Variables
 
@@ -40,6 +41,7 @@ After the Codespace starts:
 | `PORT` | — | Port to listen on (default: `3100`) |
 | `MODEL` | — | Claude model (default: `claude-opus-4-5-20251101`) |
 | `PUBLIC_URL` | — | Public URL for this agent, used in the Agent Card's `url` field |
+| `API_KEY` | — | Shared secret required in the `x-api-key` header on `/a2a` and `/tasks`. Unset = unauthenticated (dev mode) |
 
 ## A2A Endpoints
 
@@ -71,6 +73,10 @@ After the Codespace starts:
 ```
 
 Response is a [`Task`](https://a2a-protocol.org) object with `status.state` of `submitted` → `working` → `completed`/`failed`, and the crafted Slack message in `artifacts[0].parts[0].text`.
+
+### Authentication
+
+If `API_KEY` is set in `.env`, both `/a2a` and `/tasks` require a matching `x-api-key` header — omit or mismatch it and you'll get a `401` with a `WWW-Authenticate` header. The Agent Card advertises this via `securitySchemes`/`security` when a key is configured, so compliant clients (including A2A Inspector's Authentication & Headers panel) know to send it. Agent Card discovery and the control UI (`/`, `/status`, `/enable`, `/disable`) are never gated behind the key.
 
 ## Legacy Task Format (`POST /tasks`)
 

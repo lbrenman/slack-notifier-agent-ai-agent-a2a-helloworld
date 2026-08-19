@@ -29,8 +29,10 @@ const PORT          = parseInt(process.env.PORT || '3100', 10);
 const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK;
 const MODEL         = process.env.MODEL || 'claude-opus-4-5-20251101';
 const PUBLIC_URL    = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
+const API_KEY       = process.env.API_KEY || null; // if unset, /a2a and /tasks are open (dev mode)
 
 if (!SLACK_WEBHOOK) { console.error('[error] SLACK_WEBHOOK is required'); process.exit(1); }
+if (!API_KEY) { console.warn('[warn] API_KEY not set — /a2a and /tasks are unauthenticated. Set API_KEY in .env to protect this agent.'); }
 
 const anthropic = new Anthropic();
 
@@ -70,6 +72,12 @@ const AGENT_CARD = {
   },
   defaultInputModes: ['text/plain'],
   defaultOutputModes: ['text/plain'],
+  ...(API_KEY ? {
+    securitySchemes: {
+      apiKeyAuth: { type: 'apiKey', in: 'header', name: 'x-api-key' },
+    },
+    security: [{ apiKeyAuth: [] }],
+  } : {}),
   skills: [
     {
       id: 'notify_slack',
@@ -416,15 +424,30 @@ app.get('/.well-known/agent.json', (req, res) => {
   res.json(AGENT_CARD);
 });
 
+// API key auth — only enforced when API_KEY is set in .env. Protects the
+// A2A-facing endpoints only; agent card discovery and the control UI stay open.
+function requireApiKey(req, res, next) {
+  if (!API_KEY) return next(); // dev mode, no key configured
+  const provided = req.header('x-api-key');
+  if (provided && provided === API_KEY) return next();
+  addLog(`Rejected request to ${req.path} — missing/invalid x-api-key.`);
+  res.set('WWW-Authenticate', 'ApiKey realm="slack-notifier-agent", header="x-api-key"');
+  return res.status(401).json({
+    jsonrpc: '2.0',
+    id: req.body?.id ?? null,
+    error: { code: -32603, message: 'Unauthorized: missing or invalid x-api-key header' },
+  });
+}
+
 // A2A JSON-RPC 2.0 endpoint
-app.post('/a2a', async (req, res) => {
+app.post('/a2a', requireApiKey, async (req, res) => {
   const response = await handleJsonRpc(req.body);
   res.json(response);
 });
 
 // Legacy REST task submission (backward compatible with the original
 // {id, message:{parts:[{type,text}]}} shape used by github-monitor).
-app.post('/tasks', async (req, res) => {
+app.post('/tasks', requireApiKey, async (req, res) => {
   try {
     const body = req.body || {};
     const text = extractText(body.message);
@@ -458,6 +481,7 @@ app.listen(PORT, () => {
   console.log(`A2A (JSON-RPC): http://localhost:${PORT}/a2a`);
   console.log(`Legacy tasks : http://localhost:${PORT}/tasks`);
   console.log(`Model        : ${MODEL}`);
+  console.log(`Auth         : ${API_KEY ? 'x-api-key required' : 'NONE (set API_KEY in .env to protect this agent)'}`);
   console.log('\nNOTE: In Codespaces, set port', PORT, 'to Public visibility in the Ports tab.');
   console.log('NOTE: Set PUBLIC_URL in .env to your public Codespaces URL so the Agent Card\'s "url" field is correct for A2A Inspector.\n');
 });
