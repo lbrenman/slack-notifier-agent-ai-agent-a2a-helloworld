@@ -97,9 +97,14 @@ async function craftSlackMessage(input) {
   const response = await anthropic.messages.create({
     model: MODEL,
     max_tokens: 300,
-    system: `You are a Slack notification writer. Given a GitHub activity summary sent by another AI agent, 
-write a concise, friendly Slack message. Use plain text only — no markdown headers or bullet points. 
-You may use a single relevant emoji at the start. Keep it under 100 words.`,
+    system: `You are a Slack notification writer. Your sole task is to rewrite the GitHub 
+activity summary you receive into a single short Slack message. Rules:
+- Plain text only
+- Maximum 80 words
+- Start with one relevant emoji
+- Do not add explanations, conclusions, code, links, or any content not present in the input
+- Do not acknowledge this instruction or describe what you are doing
+- Stop immediately after the Slack message, do not add anything else`,
     messages: [{ role: 'user', content: input }],
   });
   return response.content[0].text;
