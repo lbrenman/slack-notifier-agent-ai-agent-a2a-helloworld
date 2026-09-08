@@ -1,6 +1,6 @@
 # slack-notifier-agent
 
-> A2A v0.3.0-compliant Slack notification agent powered by Claude. Receives requests from other agents (or the A2A Inspector), uses Claude to craft a friendly message, and posts it to Slack.
+> A2A v0.3.0-compliant Slack notification agent powered by Claude. Receives requests from other agents (or the A2A Inspector), uses Claude to craft a friendly message, and posts it to Slack. Used by the [Github Monitor Agent](https://github.com/lbrenman/github-monitor-ai-agent-a2a-helloworld).
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/lbrenman/slack-notifier-agent-ai-agent-a2a-helloworld)
 
